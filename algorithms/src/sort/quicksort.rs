@@ -13,20 +13,19 @@
 pub fn quicksort_dsa_rs(arr: &mut [i32]) {
     if arr.len() >= 2 {
         let pivot_value = arr[arr.len() / 2];
-
-        // swap first element with pivot
-        let temp = arr[0];
-        arr[0] = pivot_value;
-        arr[arr.len() / 2] = temp;
+        // swap arr[0] with arr[arr.len() / 2]
+        arr[0] ^= arr[arr.len() / 2];
+        arr[arr.len() / 2] ^= arr[0];
+        arr[0] ^= arr[arr.len() / 2];
 
         let mut swap_index = 1;
         for i in 1..arr.len() {
             if arr[i] <= pivot_value {
                 if i != swap_index {
                     // swap i with swapindex
-                    let temp = arr[i];
-                    arr[i] = arr[swap_index];
-                    arr[swap_index] = temp;
+                    arr[i] ^= arr[swap_index];
+                    arr[swap_index] ^= arr[i];
+                    arr[i] ^= arr[swap_index];
                 }
 
                 swap_index += 1;
@@ -34,9 +33,11 @@ pub fn quicksort_dsa_rs(arr: &mut [i32]) {
         }
 
         // swap pivot with swapindex - 1
-        let temp = arr[swap_index - 1];
-        arr[swap_index - 1] = arr[0];
-        arr[0] = temp;
+        if swap_index - 1 != 0 {
+            arr[0] ^= arr[swap_index - 1];
+            arr[swap_index - 1] ^= arr[0];
+            arr[0] ^= arr[swap_index - 1];
+        }
 
         quicksort_dsa_rs(&mut arr[..swap_index - 1]);
         quicksort_dsa_rs(&mut arr[swap_index..]);
