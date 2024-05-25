@@ -10,22 +10,25 @@
 // TODO: 3) make implementation generic. (-)
 // TODO: 4) adapt algorithm for usage with traits
 
-pub fn quicksort_dsa_rs(arr: &mut [i32]) {
+
+
+pub fn quicksort_dsa_rs<T>(arr: &mut [T])
+where
+    T: Ord + Copy,
+{
     if arr.len() >= 2 {
+        
         let pivot_value = arr[arr.len() / 2];
-        // swap arr[0] with arr[arr.len() / 2]
-        arr[0] ^= arr[arr.len() / 2];
-        arr[arr.len() / 2] ^= arr[0];
-        arr[0] ^= arr[arr.len() / 2];
+
+        // move pivot to the first position
+        arr.swap(0, arr.len() / 2);
 
         let mut swap_index = 1;
         for i in 1..arr.len() {
             if arr[i] <= pivot_value {
                 if i != swap_index {
                     // swap i with swapindex
-                    arr[i] ^= arr[swap_index];
-                    arr[swap_index] ^= arr[i];
-                    arr[i] ^= arr[swap_index];
+                    arr.swap(i, swap_index);
                 }
 
                 swap_index += 1;
@@ -34,9 +37,7 @@ pub fn quicksort_dsa_rs(arr: &mut [i32]) {
 
         // swap pivot with swapindex - 1
         if swap_index - 1 != 0 {
-            arr[0] ^= arr[swap_index - 1];
-            arr[swap_index - 1] ^= arr[0];
-            arr[0] ^= arr[swap_index - 1];
+            arr.swap(0, swap_index - 1);
         }
 
         quicksort_dsa_rs(&mut arr[..swap_index - 1]);

@@ -1,1 +1,2 @@
-workspace = { members = ["algorithms", "dstructures", "tests"] }
+[workspace]
+members = ["algorithms", "dstructures"]
