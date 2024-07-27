@@ -1,131 +1,137 @@
-pub struct dsa_linkedlist<T> {
-    head: Option<Box<dsa_linkedlist_node<T>>>,
+#[derive(Debug)]
+pub struct LinkedList_dsa<T> {
+    head: Option<Link<T>>,
     len: usize,
 }
 
-struct dsa_linkedlist_node<T> {
+#[derive(Debug)]
+pub struct LinkedListNode_dsa<T> {
     data: T,
-    next: Option<Box<dsa_linkedlist_node<T>>>,
+    next: Option<Link<T>>,
 }
 
-impl<T> dsa_linkedlist<T> {
+type Link<T> = Box<LinkedListNode_dsa<T>>;
+
+impl<'a, T> LinkedList_dsa<T> {
     pub fn new() -> Self {
         Self { head: None, len: 0 }
+    }
+
+    pub fn push_front(&mut self, data: T) {
+        let new_node = Box::new(LinkedListNode_dsa {
+            data,
+            next: self.head.take(),
+        });
+
+        self.head = Some(new_node);
+        self.len += 1;
+    }
+    pub fn push_back(&mut self, data: T) {
+        let new_node = Box::new(LinkedListNode_dsa { data, next: None });
+
+        match self.head {
+            Some(ref mut first_node) => {
+                let mut current = first_node;
+                // move pointer to the last node
+                while current.next.is_some() {
+                    current = current.next.as_mut().unwrap();
+                }
+
+                // here, the current reference is on the last node
+                current.next = Some(new_node);
+            }
+            None => self.head = Some(new_node),
+        };
+
+        self.len += 1;
+    }
+
+    pub fn pop_front(&mut self) -> Option<T> {
+        self.head.take().map(|node| {
+            self.head = node.next;
+            self.len -= 1;
+            node.data
+        })
+    }
+
+    pub fn pop_back(&mut self) -> Option<T> {
+        if self.len == 0 {
+            None
+        } else if self.len == 1 {
+            let head_node = self.head.take();
+            self.len -= 1;
+            head_node.map(|n| n.data)
+        } else {
+            // move pointer to the last - 1 th node
+            let mut current = self.head.as_mut().unwrap();
+            while current.next.as_mut().unwrap().next.is_some() {
+                current = current.next.as_mut().unwrap();
+            }
+
+            // on the last - 1 th node here
+            current.next.take().map(|node| {
+                self.len -= 1;
+                node.data
+            })
+        }
+    }
+
+    pub fn remove_node(&mut self, index: usize) -> Option<T> {
+        if index > self.len - 1 {
+            return None;
+        }
+
+        if self.len > 0 {
+            // list has element(s)
+            if index == 0 {
+                self.pop_front()
+            } else if index == self.len - 1 {
+                self.pop_back()
+            } else {
+                let mut current_node_index = 0;
+                let mut current_node = self.head.as_mut().unwrap();
+                while current_node.next.is_some() && current_node_index < index - 1 {
+                    current_node = current_node.next.as_mut().unwrap();
+                    current_node_index += 1;
+                }
+
+                let node_to_remove = current_node.next.take();
+                node_to_remove.map(|node| {
+                    current_node.next = node.next;
+                    self.len -= 1;
+                    node.data
+                })
+            }
+        } else {
+            None
+        }
+    }
+
+    pub fn get_node(&self, index: usize) -> Option<&LinkedListNode_dsa<T>> {
+        if index > self.len - 1 {
+            return None;
+        }
+
+        if self.len == 0 {
+            None
+        } else {
+            let mut current_index = 0;
+            let mut current_node_ref = self.head.as_ref().unwrap();
+
+            while current_index < index && current_node_ref.next.is_some() {
+                current_node_ref = current_node_ref.next.as_ref().unwrap();
+                current_index += 1;
+            }
+
+            Some(&current_node_ref.as_ref())
+        }
     }
 
     pub fn len(&self) -> usize {
         self.len
     }
-
-    pub fn is_empty(&self) -> bool {
-        self.len == 0
-    }
-
-    pub fn push_back(&mut self, data: T) {
-        let new_node = dsa_linkedlist_node { data, next: None };
-
-        match self.get_head_mut() {
-            Some(head_node) => {
-                let mut current_node = head_node;
-                while let Some(ref mut next_node) = current_node.next {
-                    current_node = next_node;
-                }
-                current_node.next = Some(Box::new(new_node));
-            }
-            None => {
-                self.head = Some(Box::new(new_node));
-            }
-        };
-
-        self.len += 1;
-    }
-
-    pub fn push_front(&mut self, data: T) {
-        let new_node = dsa_linkedlist_node {
-            data,
-            next: self.head.take(),
-        };
-
-        self.head = Some(Box::new(new_node));
-        self.len += 1;
-    }
-
-    pub fn pop(&mut self) -> Option<T> {
-        if self.len == 0 {
-            None
-        } else if self.len == 1 {
-            self.len -= 1;
-            self.head.take().map(|node| node.data)
-        } else {
-            let mut current_node = &mut self.head;
-
-            while let Some(ref mut node) = current_node {
-                // if current node's next has some node and that node's next is None, it means it is the last node
-                //
-                // start from head node, take a reference to head's next node
-                // and check for head.next.next is None.
-                // if it is None, take() head.next (node.next.take())
-                if node.next.as_ref().map_or(false, |next| next.next.is_none()) {
-                    self.len -= 1;
-                    return node.next.take().map(|node| node.data);
-                }
-                current_node = &mut node.next;
-            }
-            None
-        }
-    }
-
-    pub fn pop_front(&mut self) -> Option<T> {
-        match std::mem::replace(&mut self.head, None) {
-            Some(old_head) => {
-                self.len -= 1;
-                self.head = old_head.next;
-                Some(old_head.data)
-            }
-            None => None,
-        }
-    }
-
-    pub fn get_head_mut(&mut self) -> &mut Option<Box<dsa_linkedlist_node<T>>> {
-        &mut self.head
-    }
-
-    pub fn get_head(&self) -> &Option<Box<dsa_linkedlist_node<T>>> {
-        &self.head
-    }
 }
 
-pub struct dsa_linkedlist_iter<'a, T> {
-    next: Option<&'a dsa_linkedlist_node<T>>,
-}
 
-impl<T> dsa_linkedlist<T> {
-    pub fn iter(&self) -> dsa_linkedlist_iter<T> {
-        dsa_linkedlist_iter {
-            next: self.head.as_deref(),
-        }
-    }
-}
 
-impl<T: std::fmt::Debug> std::fmt::Debug for dsa_linkedlist<T> {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let mut current = &self.head;
-        write!(f, "head -> ")?;
-        while let Some(ref node) = current {
-            write!(f, "{:?} -> ", node.data)?;
-            current = &node.next;
-        }
-        write!(f, "None")
-    }
-}
 
-impl<'a, T> std::iter::Iterator for dsa_linkedlist_iter<'a, T> {
-    type Item = &'a T;
-
-    fn next(&mut self) -> Option<Self::Item> {
-        self.next.map(|node| {
-            self.next = node.next.as_deref();
-            &node.data
-        })
-    }
-}

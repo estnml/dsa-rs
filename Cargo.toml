@@ -1,4 +1,3 @@
 [workspace]
-members = ["algorithms", "control", "structures"]
-exclude = ["control"]
+members = ["algorithms", "structures", "tests"]
 resolver = "2"

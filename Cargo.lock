@@ -7,12 +7,12 @@ name = "algorithms"
 version = "0.1.0"
 
 [[package]]
-name = "control"
+name = "structures"
+version = "0.1.0"
+
+[[package]]
+name = "tests"
 version = "0.1.0"
 dependencies = [
  "structures",
 ]
-
-[[package]]
-name = "structures"
-version = "0.1.0"

@@ -1,2 +1,2 @@
-run_w_bt:
-    RUST_BACKTRACE=1 cargo run --bin control
+run_tests:
+    RUST_BACKTRACE=1 cargo test -- --show-output
