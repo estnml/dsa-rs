@@ -1,8 +1,10 @@
-// TODO: generic linked list: +
+// TODO: generic: +
 // TODO: CRUD: +
 // TODO: tail pointer: -
+// TODO: collection related trait impls: -
 // TODO: iterators: -
 // TODO: thread safe: -
+// TODO: non recursive drop impl?: -
 
 #[derive(Debug)]
 pub struct LinkedList_dsa<T> {
@@ -18,7 +20,7 @@ pub struct LinkedListNode_dsa<T> {
 
 type Link<T> = Box<LinkedListNode_dsa<T>>;
 
-impl<'a, T> LinkedList_dsa<T> {
+impl<T> LinkedList_dsa<T> {
     pub fn new() -> Self {
         Self { head: None, len: 0 }
     }
@@ -32,6 +34,7 @@ impl<'a, T> LinkedList_dsa<T> {
         self.head = Some(new_node);
         self.len += 1;
     }
+
     pub fn push_back(&mut self, data: T) {
         let new_node = Box::new(LinkedListNode_dsa { data, next: None });
 
@@ -137,7 +140,3 @@ impl<'a, T> LinkedList_dsa<T> {
         self.len
     }
 }
-
-
-
-

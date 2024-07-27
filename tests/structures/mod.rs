@@ -1,1 +1,2 @@
-pub mod basics;
+mod linkedlist;
+mod stack;
