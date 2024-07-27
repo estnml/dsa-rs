@@ -1,3 +1,9 @@
+// TODO: generic linked list: +
+// TODO: CRUD: +
+// TODO: tail pointer: -
+// TODO: iterators: -
+// TODO: thread safe: -
+
 #[derive(Debug)]
 pub struct LinkedList_dsa<T> {
     head: Option<Link<T>>,
