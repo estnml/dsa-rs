@@ -1,5 +1,5 @@
 // TODO: generic: +
-// TODO: push - pop: +
+// TODO: push - pop - peek: +
 // TODO: iterators?: -
 // TODO: collection related trait impls: -
 // TODO: thread safe: -
@@ -52,16 +52,18 @@ impl<T> Stack_dsa<T> {
         match self.len {
             0 => None,
             _ => {
+                // index, listeye eklenen ilk elemandan başlıyor.
+                // yani en büyük index son eklenen elemanda oluyor.
+                let mut current_item_index = self.len - 1;
                 let mut current_item_ref = self.top.as_deref();
-                let mut current_item_index = 0;
 
                 while let Some(item) = current_item_ref {
                     if current_item_index == index {
                         return current_item_ref;
                     }
 
-                    current_item_ref = current_item_ref;
-                    current_item_index += 1;
+                    current_item_ref = item.next.as_deref();
+                    current_item_index -= 1;
                 }
 
                 None

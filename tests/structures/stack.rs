@@ -14,7 +14,7 @@ mod stack_tests {
         stack.push(9);
         stack.push(11);
 
-        // println!("stack item: {:#?}", stack.peek(3));
+        println!("stack item: {:#?}", stack.peek(0));
 
         assert!(!stack.is_empty());
 
