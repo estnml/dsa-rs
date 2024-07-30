@@ -1,2 +1,2 @@
-pub mod algorithms;
-pub mod structures;
+mod algorithms;
+mod structures;

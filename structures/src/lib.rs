@@ -2,3 +2,4 @@
 pub mod linkedlist;
 pub mod stack;
 pub mod vector;
+pub mod queue;

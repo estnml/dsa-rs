@@ -1,5 +1,5 @@
 #[cfg(test)]
-mod linkedlist_tests {
+mod tests {
     use structures::linkedlist::LinkedList_dsa;
 
     #[test]

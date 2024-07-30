@@ -14,7 +14,7 @@ pub struct Stack_dsa<T> {
 
 #[derive(Debug)]
 pub struct StackItem_dsa<T> {
-    val: T,
+    data: T,
     next: Option<Link<T>>,
 }
 
@@ -25,12 +25,12 @@ impl<T> Stack_dsa<T> {
         Self { len: 0, top: None }
     }
 
-    pub fn push(&mut self, val: T) {
+    pub fn push(&mut self, data: T) {
         // stack LIFO yapısında olduğu için, son eklenen eleman ilk elemanmış gibi davranacak.
         // dolayısıyla yeni elemanın next'i, ondan önce eklenmiş olan eleman olmalı. Yani listenin top'u.
         let new_item = Box::new(StackItem_dsa {
             next: self.top.take(),
-            val,
+            data,
         });
         self.top = Some(new_item);
         self.len += 1;
@@ -40,8 +40,12 @@ impl<T> Stack_dsa<T> {
         self.top.take().map(|top_item| {
             self.top = top_item.next;
             self.len -= 1;
-            top_item.val
+            top_item.data
         })
+    }
+
+    pub fn top(&self) -> Option<&StackItem_dsa<T>> {
+        self.top.as_deref()
     }
 
     pub fn peek(&self, index: usize) -> Option<&StackItem_dsa<T>> {
