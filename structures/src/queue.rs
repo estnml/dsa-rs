@@ -1,11 +1,14 @@
-// TODO: generic: -
-// TODO: enqueue - dequeue: -
-// TODO: iterators?: -
-// TODO: collection related trait impls: -
-// TODO: thread safe: -
-// TODO: non recursive drop impl?: -
-// TODO: queue using linked list (-), array (-)
-// TODO: impl Debug: -
+// TODO: make struct generic:
+// TODO: basic ops (enqueue - dequeue):
+// TODO: implement common and appropriate collection traits:
+// TODO: thread safe:
+// TODO: multithread usable:
+// TODO: debug impl:
+// TODO: all of the above using linked list:
+// TODO: optimized drop impl for linked list implementation:
+// TODO: all of the above using array:
+
+use std::rc::Rc;
 
 pub struct Queue_dsa<T> {
     len: usize,
@@ -18,7 +21,7 @@ pub struct QueueItem_dsa<T> {
     next: Option<Link<T>>,
 }
 
-type Link<T> = std::rc::Rc<std::cell::RefCell<QueueItem_dsa<T>>>;
+type Link<T> = Rc<QueueItem_dsa<T>>;
 
 impl<T> Queue_dsa<T> {
     pub fn new() -> Self {
@@ -37,7 +40,27 @@ impl<T> Queue_dsa<T> {
     }
 
     pub fn enqueue(&mut self, data: T) {
-        todo!()
+        // queue has no elements: self and tail points same item, len++ -> self.tail.take()
+        // queue has one element: tail points old head's next, len++ -> self.tail.take()
+        // queue has at least one element: tail points old tail's next, len++ -> self.tail.take()
+
+        let new_item = Rc::new(QueueItem_dsa { data, next: None });
+
+        match self.len {
+            0 => {
+                self.head = Some(new_item.clone());
+                self.tail = Some(new_item.clone());
+            }
+            _ => {
+                self.tail.take().map(|old_tail| {
+                    old_tail.next = Some(new_item.clone());
+                });
+
+                self.tail = Some(new_item.clone());
+            }
+        };
+
+        self.len += 1;
     }
     pub fn dequeue(&mut self, data: T) {}
 
