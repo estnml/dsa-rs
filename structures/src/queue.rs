@@ -2,13 +2,12 @@
 // TODO: basic ops (enqueue - dequeue):
 // TODO: implement common and appropriate collection traits:
 // TODO: thread safe:
-// TODO: multithread usable:
 // TODO: debug impl:
 // TODO: all of the above using linked list:
 // TODO: optimized drop impl for linked list implementation:
 // TODO: all of the above using array:
 
-use std::rc::Rc;
+use std::{cell::RefCell, rc::Rc};
 
 pub struct Queue_dsa<T> {
     len: usize,
@@ -21,7 +20,7 @@ pub struct QueueItem_dsa<T> {
     next: Option<Link<T>>,
 }
 
-type Link<T> = Rc<QueueItem_dsa<T>>;
+type Link<T> = Rc<RefCell<QueueItem_dsa<T>>>;
 
 impl<T> Queue_dsa<T> {
     pub fn new() -> Self {
@@ -40,29 +39,46 @@ impl<T> Queue_dsa<T> {
     }
 
     pub fn enqueue(&mut self, data: T) {
-        // queue has no elements: self and tail points same item, len++ -> self.tail.take()
-        // queue has one element: tail points old head's next, len++ -> self.tail.take()
-        // queue has at least one element: tail points old tail's next, len++ -> self.tail.take()
+        let new_item = Rc::new(RefCell::new(QueueItem_dsa { data, next: None }));
 
-        let new_item = Rc::new(QueueItem_dsa { data, next: None });
+        match self.tail.take() {
+            Some(old_tail) => {
+                // queue has at leasdt 1 item
+                // old_tail's next will be new_item
+                // new tail will point to the new_item
 
-        match self.len {
-            0 => {
-                self.head = Some(new_item.clone());
+                // clone calls on the Rc is only incrementing the strong count.
+                // actual data is not cloned, so it is performant (for single thread though)
+                old_tail.borrow_mut().next = Some(new_item.clone());
                 self.tail = Some(new_item.clone());
             }
-            _ => {
-                self.tail.take().map(|old_tail| {
-                    old_tail.next = Some(new_item.clone());
-                });
-
+            None => {
+                // the queue is empty. head & tail points to the same item.
+                self.head = Some(new_item.clone());
                 self.tail = Some(new_item.clone());
             }
         };
 
         self.len += 1;
     }
-    pub fn dequeue(&mut self, data: T) {}
+
+    pub fn dequeue(&mut self) -> Option<T> {
+        // remove item from the head side, return the data inside of it.
+
+        match self.head.take() {
+            Some(old_head) => {
+                // queue has at least 1 item. and the current head has reference count 1 (head pointer)
+                // making head point current head'snext will de-allocate the current head item
+
+                self.head = old_head.borrow().next.clone();
+                self.len -= 1;
+                // TODO: Fix error
+                // Some(old_head.borrow().data)
+                None
+            }
+            None => None,
+        }
+    }
 
     pub fn is_empty(&self) -> bool {
         self.len == 0

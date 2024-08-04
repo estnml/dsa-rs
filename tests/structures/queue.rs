@@ -1,18 +1,18 @@
 #[cfg(test)]
 mod tests {
+    use structures::queue::Queue_dsa;
 
     #[test]
-    fn basic_ops() {
-        let mut queue: structures::queue::Queue_dsa<i32> = structures::queue::Queue_dsa::new();
+    fn passes_len() {
+        let mut que = Queue_dsa::new();
+        assert_eq!(0, que.len());
 
-        assert_eq!(queue.len(), 0);
+        que.enqueue(3);
+        que.enqueue(8);
 
-        queue.enqueue(3);
-        queue.enqueue(4);
-        queue.enqueue(5);
-        queue.enqueue(6);
+        assert_eq!(2, que.len());
 
-        assert_eq!(queue.len(), 4);
-        println!("{:#?}", queue);
+        que.dequeue();
+        assert_eq!(1, que.len());
     }
 }
